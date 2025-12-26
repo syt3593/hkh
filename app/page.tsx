@@ -4,6 +4,15 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { AppState, FoodScan, FoodItem, Nutrients, StapleMeal, CriticalSample } from '../types';
 import { analyzeFoodImage } from '../services/geminiService';
 import NutrientBadge from '../components/NutrientBadge';
+import { 
+  uploadImage, 
+  saveMealToDb, 
+  fetchMealsFromDb, 
+  saveStapleToDb, 
+  fetchStaplesFromDb, 
+  saveCriticalSampleToDb, 
+  fetchCriticalSamplesFromDb 
+} from '../services/supabaseService';
 
 const SpeechRecognition = typeof window !== 'undefined' ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
 
@@ -17,8 +26,8 @@ const Icons = {
   Carbs: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18m0-18l-3 3m3-3l3 3m-9 6h12M9 12l3 3m-3-3l3-3m-3 9h6" /></svg>,
   Fat: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747c.224-.891.076-1.785-.417-2.46-.736-1.003-1.8-1.457-2.996-1.477l-1.042-.018c-1.291-.023-2.316-.902-2.316-2.195V4.75a.75.75 0 0 0-1.5 0v3.354c0 1.293-1.026 2.172-2.317 2.195l-1.042.018c-1.196.02-2.26.474-2.996 1.477-.493.675-.641 1.569-.417 2.46A9.004 9.004 0 0 0 12 21Z" /></svg>,
   XCircle: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>,
-  ChevronDown: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5-7.5" /></svg>,
-  ChevronUp: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" /></svg>,
+    ChevronDown: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>,
+    ChevronUp: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" /></svg>,
   Microphone: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>,
   Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09-3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l1.183.394-1.183.394a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>,
   Pencil: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>,
@@ -108,19 +117,24 @@ export default function FoodTrackerPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const savedHistory = localStorage.getItem('nutrilens_history_v4');
-      if (savedHistory) setHistory(JSON.parse(savedHistory));
-      
-      const savedStaples = localStorage.getItem('nutrilens_staples_v1');
-      if (savedStaples) setStaples(JSON.parse(savedStaples));
-
-      const savedCriticals = localStorage.getItem('nutrilens_critical_samples_v1');
-      if (savedCriticals) setCriticalSamples(JSON.parse(savedCriticals));
-    } catch (e) {
-      console.error("Failed to load history", e);
-      localStorage.removeItem('nutrilens_history_v4');
+    async function loadData() {
+      try {
+        const [meals, staplesData, samples] = await Promise.all([
+          fetchMealsFromDb(),
+          fetchStaplesFromDb(),
+          fetchCriticalSamplesFromDb()
+        ]);
+        setHistory(meals);
+        setStaples(staplesData);
+        setCriticalSamples(samples);
+      } catch (e) {
+        console.error("Failed to load data from Supabase", e);
+        // 如果云端加载失败，尝试回退到 localStorage (可选)
+        const savedHistory = localStorage.getItem('nutrilens_history_v4');
+        if (savedHistory) setHistory(JSON.parse(savedHistory));
+      }
     }
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -149,11 +163,18 @@ export default function FoodTrackerPage() {
     }
   };
 
-  const saveToHistory = (scan: FoodScan) => {
-    safeLocalStorageSet('nutrilens_history_v4', [scan, ...history].slice(0, 50), setHistory);
+  const saveToHistory = async (scan: FoodScan) => {
+    try {
+      await saveMealToDb(scan);
+      setHistory(prev => [scan, ...prev].slice(0, 50));
+    } catch (e) {
+      console.error("Failed to save to Supabase", e);
+      // 回退到 localStorage
+      safeLocalStorageSet('nutrilens_history_v4', [scan, ...history].slice(0, 50), setHistory);
+    }
   };
 
-  const processCriticalSamples = (scan: FoodScan, isManual: boolean) => {
+  const processCriticalSamples = async (scan: FoodScan, isManual: boolean) => {
     if (hasSavedCritical) return;
     const newCriticals: CriticalSample[] = [];
     const threshold = isManual ? 0 : 0.3;
@@ -177,37 +198,52 @@ export default function FoodTrackerPage() {
     });
 
     if (newCriticals.length > 0) {
-       const updatedCriticals = [...newCriticals, ...criticalSamples].slice(0, 50);
-       safeLocalStorageSet('nutrilens_critical_samples_v1', updatedCriticals, setCriticalSamples);
-       setCriticalToastMessage(isManual ? `已手动归档 ${newCriticals.length} 个样本` : `已自动归档 ${newCriticals.length} 个大偏差样本`);
-       setCapturedCriticals(newCriticals.length);
-       setTimeout(() => setCapturedCriticals(0), 4000);
-       setHasSavedCritical(true);
-       setManualMarkError(null);
+       try {
+         await Promise.all(newCriticals.map(sample => saveCriticalSampleToDb(sample)));
+         const updatedCriticals = [...newCriticals, ...criticalSamples].slice(0, 50);
+         setCriticalSamples(updatedCriticals);
+         setCriticalToastMessage(isManual ? `已手动归档 ${newCriticals.length} 个样本` : `已自动归档 ${newCriticals.length} 个大偏差样本`);
+         setCapturedCriticals(newCriticals.length);
+         setTimeout(() => setCapturedCriticals(0), 4000);
+         setHasSavedCritical(true);
+         setManualMarkError(null);
+       } catch (e) {
+         console.error("Failed to save critical samples to Supabase", e);
+         // 回退
+         const updatedCriticals = [...newCriticals, ...criticalSamples].slice(0, 50);
+         safeLocalStorageSet('nutrilens_critical_samples_v1', updatedCriticals, setCriticalSamples);
+       }
     } else if (isManual) {
        setManualMarkError("请先修改上方的重量数值，以便我们记录偏差。");
        setTimeout(() => setManualMarkError(null), 3500);
     }
   };
 
-  const manualSaveCritical = () => {
-    if (currentScan) processCriticalSamples(currentScan, true);
+  const manualSaveCritical = async () => {
+    if (currentScan) await processCriticalSamples(currentScan, true);
   };
 
-  const confirmSaveStaple = () => {
+  const confirmSaveStaple = async () => {
     if (!currentScan || !stapleNameInput.trim()) return;
-    const newStaple: StapleMeal = {
-      id: Date.now().toString(),
+    const newStaple: Omit<StapleMeal, 'id'> = {
       name: stapleNameInput.trim(),
       imageUrl: currentScan.imageUrl,
       items: currentScan.items.map(({ id, ...rest }) => rest),
       totalCalories: currentScan.items.reduce((acc, item) => acc + ((item.nutrients?.calories || 0) * (item.consumedPercentage / 100)), 0)
     };
-    safeLocalStorageSet('nutrilens_staples_v1', [newStaple, ...staples].slice(0, 20), setStaples);
-    setIsSavingStaple(false);
-    setStapleNameInput('');
-    setShowStapleSuccess(true);
-    setTimeout(() => setShowStapleSuccess(false), 3000);
+    
+    try {
+      const savedStaple = await saveStapleToDb(newStaple);
+      setStaples(prev => [savedStaple, ...prev].slice(0, 20));
+      setIsSavingStaple(false);
+      setStapleNameInput('');
+      setShowStapleSuccess(true);
+      setTimeout(() => setShowStapleSuccess(false), 3000);
+    } catch (e) {
+      console.error("Failed to save staple to Supabase", e);
+      // 回退到 localStorage
+      safeLocalStorageSet('nutrilens_staples_v1', [{ ...newStaple, id: Date.now().toString() }, ...staples].slice(0, 20), setStaples);
+    }
   };
 
   const logStaple = (staple: StapleMeal) => {
@@ -229,8 +265,8 @@ export default function FoodTrackerPage() {
     setState(AppState.RESULT);
   };
 
-  const finishSession = () => {
-    if (currentScan) processCriticalSamples(currentScan, false);
+  const finishSession = async () => {
+    if (currentScan) await processCriticalSamples(currentScan, false);
     reset();
   };
 
@@ -287,11 +323,16 @@ export default function FoodTrackerPage() {
     setIsConfirming(false);
     setState(AppState.ANALYZING);
     try {
+      // 1. 先将图片上传到 Supabase Storage
+      const cloudImageUrl = await uploadImage(tempImageUrl);
+      
+      // 2. 使用 Base64 数据进行分析 (Gemini API 不接受 URL)
       const result = await analyzeFoodImage(tempImageUrl, additionalContext, selectedModel);
+      
       const newScan: FoodScan = {
         id: Date.now().toString(),
         timestamp: Date.now(),
-        imageUrl: tempImageUrl,
+        imageUrl: cloudImageUrl, // 但保存到历史记录时使用云端 URL
         description: result.description,
         insight: result.insight,
         globalScale: 100,
@@ -302,7 +343,7 @@ export default function FoodTrackerPage() {
         }))
       };
       setCurrentScan(newScan);
-      saveToHistory(newScan);
+      await saveToHistory(newScan);
       setState(AppState.RESULT);
     } catch (err: any) {
       setError(err.message || '分析失败');
