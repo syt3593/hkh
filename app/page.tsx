@@ -6,6 +6,7 @@ import { analyzeFoodImage } from '../services/geminiService';
 import NutrientBadge from '../components/NutrientBadge';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import Link from 'next/link';
 import { 
   uploadImage, 
   saveMealToDb, 
@@ -94,6 +95,7 @@ const compressImage = (base64Str: string, maxWidth = 800, quality = 0.6): Promis
 
 export default function FoodTrackerPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [isEvalAdmin, setIsEvalAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -144,6 +146,23 @@ export default function FoodTrackerPage() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    async function loadEvalAdminFlag() {
+      if (!user) {
+        setIsEvalAdmin(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase.from('eval_admins').select('role').eq('user_id', user.id).maybeSingle();
+        if (error) throw error;
+        setIsEvalAdmin(!!data);
+      } catch {
+        setIsEvalAdmin(false);
+      }
+    }
+    loadEvalAdminFlag();
+  }, [user]);
 
   useEffect(() => {
     async function loadData() {
@@ -550,6 +569,15 @@ export default function FoodTrackerPage() {
           {(state !== AppState.IDLE || isConfirming) && <button onClick={reset} className="text-gray-400 hover:text-gray-600 p-2"><Icons.XCircle /></button>}
           {user ? (
             <div className="flex items-center gap-2">
+              {isEvalAdmin && (
+                <Link
+                  href="/admin"
+                  className="text-xs font-bold px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50"
+                  title="评测后台"
+                >
+                  评测后台
+                </Link>
+              )}
               <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
                 <Icons.User />
               </div>
