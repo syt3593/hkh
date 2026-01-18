@@ -1,0 +1,110 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/eval",
+      "regex": "^/admin/eval(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/eval(?:/)?$"
+    },
+    {
+      "page": "/api/admin/eval-admins",
+      "regex": "^/api/admin/eval\\-admins(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/eval\\-admins(?:/)?$"
+    },
+    {
+      "page": "/api/admin/eval-cases/upload",
+      "regex": "^/api/admin/eval\\-cases/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/eval\\-cases/upload(?:/)?$"
+    },
+    {
+      "page": "/api/admin/eval-runs/results",
+      "regex": "^/api/admin/eval\\-runs/results(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/eval\\-runs/results(?:/)?$"
+    },
+    {
+      "page": "/api/admin/eval-runs/run",
+      "regex": "^/api/admin/eval\\-runs/run(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/eval\\-runs/run(?:/)?$"
+    },
+    {
+      "page": "/api/admin/eval-suites",
+      "regex": "^/api/admin/eval\\-suites(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/eval\\-suites(?:/)?$"
+    },
+    {
+      "page": "/api/analyze",
+      "regex": "^/api/analyze(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/analyze(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

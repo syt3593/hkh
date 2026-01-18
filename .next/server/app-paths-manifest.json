@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/eval/page": "app/admin/eval/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/admin/eval-admins/route": "app/api/admin/eval-admins/route.js",
+  "/api/admin/eval-cases/upload/route": "app/api/admin/eval-cases/upload/route.js",
+  "/api/admin/eval-runs/results/route": "app/api/admin/eval-runs/results/route.js",
+  "/api/admin/eval-runs/run/route": "app/api/admin/eval-runs/run/route.js",
+  "/api/admin/eval-suites/route": "app/api/admin/eval-suites/route.js",
+  "/api/analyze/route": "app/api/analyze/route.js",
+  "/page": "app/page.js"
+}

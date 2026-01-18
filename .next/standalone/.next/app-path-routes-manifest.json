@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/eval/page": "/admin/eval",
+  "/admin/page": "/admin",
+  "/api/admin/eval-admins/route": "/api/admin/eval-admins",
+  "/api/admin/eval-cases/upload/route": "/api/admin/eval-cases/upload",
+  "/api/admin/eval-runs/results/route": "/api/admin/eval-runs/results",
+  "/api/admin/eval-runs/run/route": "/api/admin/eval-runs/run",
+  "/api/admin/eval-suites/route": "/api/admin/eval-suites",
+  "/api/analyze/route": "/api/analyze",
+  "/page": "/"
+}

@@ -48,10 +48,7 @@ const Icons = {
   Trash: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>,
 };
 
-const MODELS = {
-  FLASH: 'gemini-3-flash-preview',
-  PRO: 'gemini-3-pro-preview'
-};
+const MODEL = 'gemini-2.0-flash';
 
 const CAMERA_TIPS = [
   { text: "尝试 45 度俯拍以获得最佳体积估算", icon: <Icons.Angle /> },
@@ -104,7 +101,7 @@ export default function FoodTrackerPage() {
   const [authError, setAuthError] = useState<string | null>(null);
 
   const [state, setState] = useState<AppState>(AppState.IDLE);
-  const [selectedModel, setSelectedModel] = useState(MODELS.FLASH);
+  const selectedModel = MODEL;
   const [history, setHistory] = useState<FoodScan[]>([]);
   const [staples, setStaples] = useState<StapleMeal[]>([]);
   const [criticalSamples, setCriticalSamples] = useState<CriticalSample[]>([]);
@@ -605,10 +602,7 @@ export default function FoodTrackerPage() {
           <div className="space-y-8 py-6 animate-in fade-in">
             {error && <div className="bg-red-50 border border-red-100 text-red-500 px-4 py-3 rounded-2xl flex items-center gap-3 text-sm font-bold animate-in slide-in-from-top-2"><Icons.Warn />{error}</div>}
             
-            <div className="bg-white p-1 rounded-2xl flex items-center shadow-sm border border-gray-100 mx-auto w-fit">
-              <button onClick={() => setSelectedModel(MODELS.FLASH)} className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${selectedModel === MODELS.FLASH ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-600'}`}>快速版</button>
-              <button onClick={() => setSelectedModel(MODELS.PRO)} className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${selectedModel === MODELS.PRO ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}>精细版</button>
-            </div>
+
 
             <div className="text-center space-y-2">
               <h2 className="text-4xl font-black text-gray-800 tracking-tight">智能识餐。</h2>
@@ -669,7 +663,7 @@ export default function FoodTrackerPage() {
           <div className="animate-in slide-in-from-bottom-10 space-y-6 pb-32">
             <div className="relative rounded-3xl overflow-hidden shadow-xl">
               <img src={tempImageUrl} className="w-full aspect-video object-cover" />
-              <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black text-white uppercase tracking-widest">{selectedModel === MODELS.PRO ? '精细模式' : '快速模式'}</div>
+
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-2"><div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><Icons.Sparkles /></div><h3 className="text-xl font-black text-gray-800">补充细节</h3></div>
@@ -706,7 +700,7 @@ export default function FoodTrackerPage() {
         {state === AppState.ANALYZING && (
           <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center text-center p-8 space-y-6">
             <div className="w-24 h-24 relative"><div className="absolute inset-0 border-4 border-green-100 rounded-full"></div><div className="absolute inset-0 border-4 border-green-600 rounded-full border-t-transparent animate-spin"></div><div className="absolute inset-0 flex items-center justify-center text-green-600"><Icons.Sparkles /></div></div>
-            <div className="space-y-2"><h3 className="text-2xl font-black text-gray-800 tracking-tight">AI 视觉扫描中...</h3><p className="text-green-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4">正在通过 {selectedModel === MODELS.PRO ? '精细版模型' : '快速版模型'} 分析</p>
+            <div className="space-y-2"><h3 className="text-2xl font-black text-gray-800 tracking-tight">AI 视觉扫描中...</h3><p className="text-green-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4">正在智能分析您的餐食</p>
                <div className="bg-green-50/50 p-4 rounded-2xl max-w-[280px] mx-auto animate-in fade-in slide-in-from-bottom-2"><p className="text-green-800 text-xs font-bold mb-1">💡 健康冷知识</p><p className="text-green-600 text-sm font-medium leading-relaxed">{HEALTH_TIPS[currentHealthTip]}</p></div>
             </div>
           </div>
